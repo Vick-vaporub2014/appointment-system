@@ -21,7 +21,7 @@
     <p>Business logic and orchestration(Services, Interfaces,DTOs and ServiceResponse)</p>
   </li>
   <li><b>Domain</b><br>
-  <p>It is the core of the system, where the purest entities and rules reside.(Enities, etc.)</p>
+  <p>It is the core of the system, where the purest entities and rules reside.(Entities, etc.)</p>
   </li>
   <li><b>Infrastructure</b><br>
   <p>It is the layer that connects to external resources (Repositories, DbContext, etc.</p>
@@ -37,5 +37,5 @@
   - dotnet restore
 4. Run the application
   - dotnet run  
-5. Acces to the API
-  - The APi be available at: https://localhost:7013
+5. Access to the API
+  - The API be available at: https://localhost:7013
