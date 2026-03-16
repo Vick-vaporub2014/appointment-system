@@ -17,9 +17,16 @@ using Infrastructure.UnitOfWork;
 
 
 var builder = WebApplication.CreateBuilder(args);
+// Add services to the container.
+//This means always load the appsettings.json file and then override it with the environment-specific file if it exists.
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
+
 //Connection to SQL Server Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 //Register the identity services and configure it to use the ApplicationDbContext and ApplicationUser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
