@@ -118,7 +118,7 @@ app.UseExceptionHandler(errorApp =>
         }
     });
 });
-
+app.UseMiddleware<ErrorHandlingMiddlewareService>();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
