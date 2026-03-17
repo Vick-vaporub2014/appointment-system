@@ -19,6 +19,7 @@
   <li><b>Application</b><br>
     <p>Business logic and orchestration(Services, Interfaces,DTOs and ServiceResponse)</p>
   </li>
+  
   <li><b>Domain</b><br>
   <p>It is the core of the system, where the purest entities and rules reside.(Entities, etc.)</p>
   </li>
@@ -27,20 +28,51 @@
   </li>
 </ul>
 
-## Getting
-```bash
-1. Clone the repository
-  - git clone  https://github.com/Vick-vaporub2014/appointment-system.git
-2. Navigate to the project folder
-  - cd appointment-system
-3. Restore dependencies
-  - dotnet restore
-4. Run the application
-  - dotnet run  
-5. Access to the API the API be available at:
-  - https://localhost:7013
-Build and run containers
--docker compose up --build
-- The API will be avaible at:  http://localhost:8080
-- - SQL Server will be available at: localhost,1433
+## Getting started
+1. Clone the Repository
+     ```bash
+     git clone https://github.com/Vick-vaporub2014/appointment-system.git
+     cd appointment-system
+2. Build conteiners
+     ```bash
+     docker compose up --build
+3. The Api will be available at:
+     ```bash
+     http://localhost:8080
+4. The SQL Server will be available at:
+     ```bash
+     localhost,1433
+## Principals Endpoints (example)
+<table>
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Endpoint</th>
+      <th>Description</th>
+      <th>Authenitcation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>POST</td>
+      <td>/api/appointment</td>
+      <td>Create appointment</td>
+      <td>(Patient)</td>
+    </tr>
+    <tr>
+      <td>GET</td>
+      <td>/api/appointment</td>
+      <td>Get all appointments</td>
+      <td>(Admin and Doctor)</td>
+    </tr>
+  </tbody>
+</table>
+## Services Response
+1. In  a error case, the serviceresponse with (example):
+  {
+  "success": false,
+  "message": "Appointment overlaps with another",
+  "errorType": "BusinessRule"
+}
+
 
