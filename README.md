@@ -67,12 +67,12 @@
     </tr>
   </tbody>
 </table>
+
 ## Services Response
-1. In  a error case, the serviceresponse with (example):
-  {
+  1. In  a error case, the serviceresponse with (example):<br>
+  ```bash
   "success": false,
   "message": "Appointment overlaps with another",
   "errorType": "BusinessRule"
-}
 
 
