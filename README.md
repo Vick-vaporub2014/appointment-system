@@ -27,7 +27,7 @@
   </li>
 </ul>
 
-## Getting started
+## Getting
 ```bash
 1. Clone the repository
   - git clone  https://github.com/Vick-vaporub2014/appointment-system.git
@@ -39,3 +39,8 @@
   - dotnet run  
 5. Access to the API the API be available at:
   - https://localhost:7013
+Build and run containers
+-docker compose up --build
+- The API will be avaible at:  http://localhost:8080
+- - SQL Server will be available at: localhost,1433
+
