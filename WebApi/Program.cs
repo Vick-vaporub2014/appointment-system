@@ -118,12 +118,12 @@ app.UseExceptionHandler(errorApp =>
         }
     });
 });
-app.UseMiddleware<ErrorHandlingMiddlewareService>();
+
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseMiddleware<ErrorHandlingMiddlewareService>();
 app.MapControllers();
 app.Run();
 
