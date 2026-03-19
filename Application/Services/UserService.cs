@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using Application.InterfacesRepo;
 using Application.InterfacesServices;
+using Domain.Enitities;
 using Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,12 @@ namespace Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IAuditLogService _auditLogService;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IAuditLogService auditLogService)
         {
             _userRepository = userRepository;
+            _auditLogService = auditLogService;
         }
         public async Task<ServiceResponse<UserDTO>> GetUserByIdAsync(string userId)
         {
@@ -60,9 +63,10 @@ namespace Application.Services
         {
             
             if (role != Roles.Admin && role != Roles.Patient && role!= Roles.Doctor)
-                throw new ArgumentException("Invalid role");
+            throw new ArgumentException("Invalid role");
 
             await _userRepository.AssignRoleAsync(userId, role);
+            await _auditLogService.LogActionAsync("Assign role", $"Assign Role {role}",$"user {userId} now have the role {role}");
         }
 
 
