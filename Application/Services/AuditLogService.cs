@@ -36,7 +36,7 @@ namespace Application.Services
             var logs = await _repository.GetByUserIdAsync(userId);
             return logs.Select(l => new AuditLogDTO
             {
-                AuditLogId = l.AuditLogId,
+                
                 UserId = l.UserId,
                 Action = l.Action,
                 DateTime = l.DateTime,
@@ -50,7 +50,7 @@ namespace Application.Services
             var logs = await _repository.GetAllAsync();
             return logs.Select(l => new AuditLogDTO
             {
-                AuditLogId = l.AuditLogId,
+                
                 UserId = l.UserId,
                 Action = l.Action,
                 DateTime = l.DateTime

@@ -17,6 +17,10 @@ using Infrastructure.UnitOfWork;
 
 
 var builder = WebApplication.CreateBuilder(args);
+var k = builder.Configuration["Jwt:Key"];
+if(string.IsNullOrEmpty(k))
+    throw  new InvalidOperationException("JWT key is not configured in appsettings.json or environment variables.");
+
 // Add services to the container.
 //This means always load the appsettings.json file and then override it with the environment-specific file if it exists.
 builder.Configuration
@@ -42,6 +46,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ErrorHandlingMiddlewareService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -59,7 +64,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            Encoding.UTF8.GetBytes(k))
     };
 });
 

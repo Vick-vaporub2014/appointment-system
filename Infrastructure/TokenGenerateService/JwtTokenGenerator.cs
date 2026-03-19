@@ -30,7 +30,11 @@ namespace Infrastructure.TokenGenerateService
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var keyValue = _configuration["Jwt:Key"];
+            if (string.IsNullOrEmpty(keyValue))
+                throw new InvalidOperationException("JWT key is not configured");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyValue));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
