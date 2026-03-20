@@ -23,12 +23,13 @@ services:
       - sql_data:/var/opt/mssql #Para que los datos de la DB no se borren
     restart: always
   watchtower:
-    image: containrrr/watchtower:2.1.0
+    image: containrrr/watchtower:amd64-latest
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: api --interval 30
     restart: always
+
 volumes:
   sql_data:
 
