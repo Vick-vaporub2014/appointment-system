@@ -78,11 +78,17 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddOpenApi();"
 
 var app = builder.Build();
+// Apply pending migrations and create the database if it does not exist
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();// This will apply any pending migrations and create the database if it does not exist
+}
 //Create default roles if they do not exist
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { Roles.Patient, Roles.Admin, Roles.Doctor};
+    string[] roles = { Roles.Patient, Roles.Admin, Roles.Doctor };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
