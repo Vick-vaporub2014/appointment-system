@@ -11,10 +11,10 @@ namespace Domain.Enitities
     public class Appointment
     {
         public int AppointmentId { get; private set; }
-        public string UserId { get; private set; } //Referenes to AspNet Identity User
+        public string UserId { get; private set; } = string.Empty;//Referenes to AspNet Identity User
         public DateTime DateTime { get; private set; }
-        public string Status { get; private set; }
-        public string Notes { get; private set; }
+        public string Status { get; private set; } = string.Empty;
+        public string? Notes { get; private set; }
 
         public Appointment() { } //EF Core requires a parameterless constructor
         //Validations Constructor

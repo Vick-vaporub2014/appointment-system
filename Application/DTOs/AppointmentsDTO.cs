@@ -10,8 +10,8 @@ namespace Application.DTOs
     {
         public int AppointmentId { get; set; }
         public DateTime DateTime { get; set; }
-        public string Status { get; set; }
-        public string Notes { get; set; }
-        public UserDTO User { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public string? Notes { get; set; }
+        public UserDTO User { get; set; } = new UserDTO();
     }
 }
