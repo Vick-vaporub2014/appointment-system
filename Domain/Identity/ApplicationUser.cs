@@ -12,10 +12,9 @@ namespace Domain.Identity
     {
         public string? FullName { get; set; }
         
-
-        public ICollection<Appointment> Appointments { get; set; }
-        public ICollection<RefreshToken> RefreshTokens { get; set; }
-        public ICollection<AuditLog> AuditLogs { get; set; }
+        public ICollection<Appointment> Appointments { get; set; }=new List<Appointment>();
+        public ICollection<RefreshToken> RefreshTokens { get; set; }=new List<RefreshToken>();
+        public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
     }
 }

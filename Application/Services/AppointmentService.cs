@@ -106,7 +106,7 @@ namespace Application.Services
             {
                 appointment.UpdateStatus(dto.Status, dto.Notes);
                 await _repository.UpdateAsync(appointment);
-                await _auditLogService.LogActionAsync(appointment.UserId, "Updated", $"Update appointment {appointment.AppointmentId}");
+                await _auditLogService.LogActionAsync(appointment.UserId, "Updated", $"Update appointment {appointment.AppointmentId} for {appointment.UserId} at {appointment.DateTime}" );
                 await _unitOfWork.CommitAsync();
                 var userDto = await _userService.GetUserByIdAsync(appointment.UserId);
                 return new ServiceResponse<AppointmentsDTO>
@@ -229,7 +229,7 @@ namespace Application.Services
             try
             {
                 await _repository.DeleteAsync(id);
-                await _auditLogService.LogActionAsync(userId, "Deleted", $"Deleted appointment {id}");
+                await _auditLogService.LogActionAsync(userId, "Deleted", $"Deleted appointment {id} for {appointment.UserId} at {appointment.DateTime}");
                 await _unitOfWork.CommitAsync();
                 return new ServiceResponse<bool>
                 {

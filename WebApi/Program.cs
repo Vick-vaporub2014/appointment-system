@@ -17,6 +17,10 @@ using Infrastructure.UnitOfWork;
 
 
 var builder = WebApplication.CreateBuilder(args);
+var k = builder.Configuration["Jwt:Key"];
+if(string.IsNullOrEmpty(k))
+    throw  new InvalidOperationException("JWT key is not configured in appsettings.json or environment variables.");
+
 // Add services to the container.
 //This means always load the appsettings.json file and then override it with the environment-specific file if it exists.
 builder.Configuration
@@ -42,6 +46,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ErrorHandlingMiddlewareService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -59,7 +64,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            Encoding.UTF8.GetBytes(k))
     };
 });
 
@@ -73,11 +78,17 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddOpenApi();"
 
 var app = builder.Build();
+// Apply pending migrations and create the database if it does not exist
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();// This will apply any pending migrations and create the database if it does not exist
+}
 //Create default roles if they do not exist
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { Roles.Patient, Roles.Admin, Roles.Doctor};
+    string[] roles = { Roles.Patient, Roles.Admin, Roles.Doctor };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))

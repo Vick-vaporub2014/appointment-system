@@ -9,9 +9,8 @@ namespace Application.DTOs
     public class UpdateAppointmentDTO
     {
         public int AppointmentId { get; set; }
-        public string Status { get; set; }
-        public string Notes { get; set; }
-        
+        public string Status { get; set; } = string.Empty;
+        public string? Notes { get; set; }      
 
     }
 }
