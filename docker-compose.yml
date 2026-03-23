@@ -21,6 +21,7 @@ services:
       - "1433:1433"
     volumes:
       - sql_data:/var/opt/mssql #Para que los datos de la DB no se borren
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
 
 volumes:
