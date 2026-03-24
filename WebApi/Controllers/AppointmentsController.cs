@@ -39,7 +39,7 @@ namespace WebApi.Controllers
             }
             return Created();
         }
-        [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
+        //[Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
         [HttpGet]
         public async Task<IActionResult> GetAllAppointments()
         {

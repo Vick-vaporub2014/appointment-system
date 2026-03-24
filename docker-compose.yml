@@ -23,7 +23,12 @@ services:
       - sql_data:/var/opt/mssql #Para que los datos de la DB no se borren
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
-
+  frontend:
+    build: ./BlazorUI
+    ports:
+      - "5000:80"
+    depends_on:
+      - api
 volumes:
   sql_data:
 
