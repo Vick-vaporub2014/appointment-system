@@ -1,0 +1,43 @@
+﻿@page "/appointments"
+@using BlazorUI.Models
+@using BlazorUI.Services
+@inject AppointmentService AppointmentService
+
+<h3>Appointments</h3>
+
+@if (appointments == null)
+{
+    <p>Loading...</p>
+}
+else if (!appointments.Any())
+{
+    <p>No appointments found.</p>
+}
+else
+{
+    <ul>
+        @foreach (var a in appointments)
+        {
+            <li>@a.AppointmentId - @a.DateTime - @a.Status - @a.User.Name</li>
+        }
+    </ul>
+}
+
+@code {
+
+    private List<Appointment>? appointments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await AppointmentService.GetAllAppointmentAsync();
+        if (result.Success)
+        {
+            appointments = result.Data;
+        }
+        else
+        {
+            // Manejo de error
+            Console.WriteLine(result.Message);
+        }
+    }
+}
