@@ -67,15 +67,23 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(k))
     };
 });
+//Dynamic CORS CONFIGURATION
+// Load allowed origins from configuration (appsettings.json)
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DynamicCors", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Add services to the container.
-//// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();"
 
 var app = builder.Build();
 // Apply pending migrations and create the database if it does not exist
@@ -97,13 +105,6 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
-        //app.MapOpenApi();
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
 
 app.UseExceptionHandler(errorApp =>
 {
@@ -129,7 +130,16 @@ app.UseExceptionHandler(errorApp =>
         }
     });
 });
+//Use  CORS policy
+app.UseCors("DynamicCors");
 
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        //app.MapOpenApi();
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
