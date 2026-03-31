@@ -100,7 +100,7 @@ namespace Application.Services
                 RefreshTokenId = Guid.NewGuid(),
                 UserId = user.Id,
                 Token = Guid.NewGuid().ToString(),
-                Expires = DateTime.UtcNow.AddMinutes(10)
+                Expires = DateTime.UtcNow.AddDays(1)
             };  
             await _refreshTokenRepository.AddAsync(refreshToken);
 
