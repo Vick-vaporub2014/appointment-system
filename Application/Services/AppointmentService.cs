@@ -204,7 +204,7 @@ namespace Application.Services
                 Message = "Appointments retrieved successfully"
              };
         }
-        public async Task<ServiceResponse<bool>> DeleteAppointmentAsync(int id, string userId)
+        public async Task<ServiceResponse<bool>> DeleteAppointmentAsync(int id)
         {
             var appointment = await _repository.GetByIdAsync(id);
             if (appointment == null)
@@ -216,20 +216,12 @@ namespace Application.Services
                     ErrorType = "NotFound"
                 };
             }
-            if (appointment.UserId != userId)
-            {
-                return new ServiceResponse<bool>
-                {
-                    Success = false,
-                    Message = "Unauthorized to delete this appointment",
-                    ErrorType = "Unauthorized"
-                };
-            }
+
             await _unitOfWork.BeginTransactionAsync();
             try
             {
                 await _repository.DeleteAsync(id);
-                await _auditLogService.LogActionAsync(userId, "Deleted", $"Deleted appointment {id} for {appointment.UserId} at {appointment.DateTime}");
+                await _auditLogService.LogActionAsync($"{appointment.UserId}","Deleted", $"Deleted appointment {id} for {appointment.UserId} at {appointment.DateTime}");
                 await _unitOfWork.CommitAsync();
                 return new ServiceResponse<bool>
                 {
