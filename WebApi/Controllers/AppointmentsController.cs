@@ -25,7 +25,7 @@ namespace WebApi.Controllers
             {
                 return BadRequest(result);
             }
-            return Created();
+            return Ok(result);
         }
         [Authorize(Roles = Roles.Admin +","+Roles.Doctor)]
         [HttpPut("status")]
@@ -35,9 +35,11 @@ namespace WebApi.Controllers
             if (!result.Success)
             {
                 if (result.ErrorType == "NotFound") return NotFound(result);
+                if (result.ErrorType == "Unauthorized") return Unauthorized(result);
+
                 return BadRequest(result);
             }
-            return Created();
+            return Ok(result);
         }
         //[Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
         [HttpGet]
@@ -72,7 +74,7 @@ namespace WebApi.Controllers
                 if (result.ErrorType == "Unauthorized") return Unauthorized(result);
                 return BadRequest(result);
             }
-            return NoContent();
+            return Ok(result);
 
         }
     }
