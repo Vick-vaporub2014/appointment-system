@@ -63,9 +63,9 @@ namespace WebApi.Controllers
         }
         [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAppointment(int id, [FromQuery] string userId)
+        public async Task<IActionResult> DeleteAppointment(int id)
         {
-            var result = await _appointmentService.DeleteAppointmentAsync(id, userId);
+            var result = await _appointmentService.DeleteAppointmentAsync(id);
             if (!result.Success)
             {
                 if (result.ErrorType == "NotFound") return NotFound(result);

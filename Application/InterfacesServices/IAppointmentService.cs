@@ -14,7 +14,7 @@ namespace Application.Interfaces
         Task<ServiceResponse<AppointmentsDTO>> UpdateAppointmentStatusAsync(UpdateAppointmentDTO dto);
         Task<ServiceResponse<List<AppointmentsDTO>>> GetAllAppointmentAsync();
         Task<ServiceResponse<List<AppointmentsDTO>>> GetAppointmentByUserAsync(string userId);
-        Task<ServiceResponse<bool>> DeleteAppointmentAsync(int id, string userId);
+        Task<ServiceResponse<bool>> DeleteAppointmentAsync(int id);
 
     }
 
