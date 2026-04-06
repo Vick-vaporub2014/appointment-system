@@ -25,7 +25,8 @@ if(string.IsNullOrEmpty(k))
 //This means always load the appsettings.json file and then override it with the environment-specific file if it exists.
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 //Connection to SQL Server Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
