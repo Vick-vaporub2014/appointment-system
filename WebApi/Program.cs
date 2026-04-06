@@ -49,7 +49,7 @@ if (string.IsNullOrEmpty(connectionString))
 
 //Connection to SQL Server Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString(connectionString)));
+    options.UseSqlServer(connectionString));
 
 //Register the identity services and configure it to use the ApplicationDbContext and ApplicationUser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
