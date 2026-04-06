@@ -30,7 +30,7 @@ namespace Infrastructure.TokenGenerateService
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            var keyValue = _configuration["Jwt:Key"];
+            var keyValue = _configuration["JWT_KEY"]; 
             if (string.IsNullOrEmpty(keyValue))
                 throw new InvalidOperationException("JWT key is not configured");
 
@@ -38,12 +38,13 @@ namespace Infrastructure.TokenGenerateService
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _configuration["JWT_ISSUER"],
+                audience: _configuration["JWT_AUDIENCE"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(5),
                 signingCredentials: creds
             );
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
