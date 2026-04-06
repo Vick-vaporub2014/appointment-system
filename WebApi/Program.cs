@@ -40,9 +40,16 @@ if (builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Doc
     }
 }
 
+if (string.IsNullOrEmpty(connectionString))
+{
+    // fallback a DefaultConnection solo en Development
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+
+
 //Connection to SQL Server Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString(connectionString)));
 
 //Register the identity services and configure it to use the ApplicationDbContext and ApplicationUser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
