@@ -2,31 +2,43 @@ using Application.Interfaces;
 using Application.InterfacesRepo;
 using Application.InterfacesServices;
 using Application.Services;
-using Infrastructure.DbContext;
+using Application.UnitOfWork;
+using Domain.Enums;
 using Domain.Identity;
+using Infrastructure.DbContext;
 using Infrastructure.Repositries;
 using Infrastructure.TokenGenerateService;
+using Infrastructure.UnitOfWork;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Domain.Enums;
-using Application.UnitOfWork;
-using Infrastructure.UnitOfWork;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var k = builder.Configuration["Jwt:Key"];
-if(string.IsNullOrEmpty(k))
-    throw  new InvalidOperationException("JWT key is not configured in appsettings.json or environment variables.");
 
 // Add services to the container.
 //This means always load the appsettings.json file and then override it with the environment-specific file if it exists.
 builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
+//Read environment variables
+var jwtKey = builder.Configuration["JWT_KEY"];
+var jwtIssuer = builder.Configuration["JWT_ISSUER"];
+var jwtAudience = builder.Configuration["JWT_AUDIENCE"];
+var connectionString = builder.Configuration["DB_CONNECTION"];
+
+if (builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Docker"))
+{
+    if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(connectionString))
+    {
+        throw new InvalidOperationException("JWT_KEY y DB_CONNECTION deben estar configurados en producción/Docker.");
+    }
+}
 
 //Connection to SQL Server Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -49,10 +61,11 @@ builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ErrorHandlingMiddlewareService>();
 
+//Configure JWT authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = "JwtBearer";
-    options.DefaultChallengeScheme = "JwtBearer";
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer("JwtBearer", options =>
 {
@@ -62,10 +75,10 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(k))
+            Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 //Dynamic CORS CONFIGURATION
