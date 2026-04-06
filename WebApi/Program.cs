@@ -76,7 +76,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    var keyBytes = Convert.FromBase64String(jwtKey);
+    var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
