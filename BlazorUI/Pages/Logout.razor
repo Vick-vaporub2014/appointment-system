@@ -1,0 +1,38 @@
+﻿@page "/logout"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager NavigationManager
+@inject IAuthServices IAuthServices
+
+<div class="d-flex justify-content-center align-items-start vh-100">
+    <div class="card shadow-sm mt-5" style="width: 22rem;">
+        <div class="card-body text-center">
+            <h4 class="card-title mb-3">Cerrar Sesión</h4>
+            <h6 class="card-subtitle mb-3 text-muted">¿Quieres cerrar tu sesión?</h6>
+            <p class="card-text">
+                Al confirmar, se eliminarán tus credenciales guardadas y volverás a la pantalla de inicio de sesión.
+            </p>
+
+            <div class="d-flex justify-content-around mt-4">
+                <button class="btn btn-danger" @onclick="ConfirmLogout">Confirmar</button>
+                <button class="btn btn-secondary" @onclick="GoToLogin">Ir a Login</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task ConfirmLogout()
+    {
+        await IAuthServices.LogoutAsync();
+
+        var customProvider = (CustomAuthStateProvider)AuthProvider;
+        await customProvider.NotifyUserLogout();
+
+        NavigationManager.NavigateTo("/");
+    }
+    private void GoToLogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}

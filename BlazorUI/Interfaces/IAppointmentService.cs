@@ -9,6 +9,6 @@ namespace BlazorUI.Interfaces
         Task<ServiceResponse<Appointment>> UpdateAppointmentStatusAsync(UpdateAppointment dto);
         Task<ServiceResponse<List<Appointment>>> GetAllAppointmentAsync();
         Task<ServiceResponse<List<Appointment>>> GetAppointmentByUserAsync(string userId);
-        Task<ServiceResponse<bool>> DeleteAppointmentAsync(int id, string userId);
+        Task<ServiceResponse<bool>> DeleteAppointmentAsync(int id);
     }
 }

@@ -1,0 +1,128 @@
+﻿@page "/admin/dashboard"
+@layout AdminLayout
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Mis Citas</h2>
+    <div class="d-flex align-items-center mb-3 gap-2">
+
+    
+        <input type="text" class="form-control w-auto"
+               placeholder="Buscar por usuario"
+               @bind="searchUser" />
+
+        <input type="text" class="form-control w-auto"
+               placeholder="Buscar por nota"
+               @bind="searchNotes" />
+        <select class="form-select w-auto" @bind="SelectedStatus">
+            <p>Filtro por status</p>
+            <option value="todos">Todos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="aceptada">Aceptadas</option>
+            <option value="cancelada">Canceladas</option>
+        </select>
+
+        <span class="badge bg-primary ms-2">
+            Resultado: @filteredAppointments.Count()
+        </span>
+    </div>
+    <button class="btn btn-success mb-3" @onclick="() => Create()">Nueva cita</button>
+    <div class="row">
+        @if (appointments == null)
+        {
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+        }
+        else if (!appointments.Any())
+        {
+            <div class="col-12 text-center">
+                <p class="text-muted">No tienes citas registradas.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var appt in filteredAppointments)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header @(appt.Status == "aceptada"? "bg-success bg-opacity-50":
+                        appt.Status == "pendiente" ? "bg-warning bg-opacity-50" :
+                        appt.Status == "cancelada" ? "bg-danger bg-opacity-50" : "bg-primary ")">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">@appt.AppointmentId</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@appt.DateTime.ToString("dd/MM/yyyy HH:mm")</h6>
+                            <p class="card-text">
+                                <strong>Cliente:</strong> @(string.IsNullOrWhiteSpace(appt.User.Name)
+                                ? appt.User.Email : appt.User.Name)<br />
+                                <strong>Estado:</strong> @appt.Status <br />
+                                <strong>Notas:</strong> @appt.Notes
+                            </p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <select class="form-select form-select-sm w-50"
+                                    @onchange="(e) => UpdateStatus(appt.AppointmentId, e.Value?.ToString())">
+                                <option selected disabled>Actualizar estado</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="aceptada">Aceptada</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                            @* "pendiente", "aceptada", "cancelada" *@
+                            <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(appt.AppointmentId)">
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        
+    </div>
+</div>
+
+@if (toast.Visible)
+{
+    <div class="my-toast @toast.Type">
+        @toast.Message
+    </div>
+}
+
+@if (isCreateOpen)
+{
+    <ModalFormCompornent Title="Crear cita"
+                         EditContext="editContext"
+                         OnValidSubmit="SaveCreate"
+                         OnCancel="Cancel">
+
+        <div class="mb-3">
+            <h3>El rango de citas es de 1hr</h3>
+            <label class="form-label">Fecha y hora</label>
+            <InputText type="datetime-local" @bind-Value="dateTimeString" class="form-control" />
+            <ValidationMessage For="@(() => createAppointment.DateTime)" />
+
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Notas</label>
+            <InputTextArea class="form-control" @bind-Value="createAppointment.Notes" />
+            <ValidationMessage For="@(() => createAppointment.Notes)" />
+
+        </div>
+    </ModalFormCompornent>
+}
+
+@if (isDeleteConfirmOpen)
+{
+    <ModalFormCompornent Title="Confirmar eliminación"
+                         OnValidSubmit="ConfirmDeleteAppointment"
+                         OnCancel="CancelDelete">
+        <div class="mb-3">
+            <p>¿Estás seguro de que deseas eliminar esta cita?</p>
+        </div>
+    </ModalFormCompornent>
+}
+
+
+
+
