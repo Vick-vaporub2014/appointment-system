@@ -1,0 +1,88 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@layout MainLayout
+
+<PageTitle>Home</PageTitle>
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold text-primary">Bienvenidos a MiSistema</h1>
+        <p class="lead">Tu salud y bienestar, nuestra prioridad.</p>
+    </div>
+
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2 class="text-secondary">Sobre nosotros</h2>
+            <p>
+                Somos una sucursal dedicada a brindar servicios médicos de calidad,
+                con atención personalizada y tecnología moderna para el cuidado de tu salud.
+            </p>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Nuestra misión</h5>
+                    <p class="card-text">
+                        Ofrecer un servicio confiable y humano, donde cada paciente se sienta acompañado.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="text-secondary">Nuestra historia</h2>
+            <p>
+                Desde nuestros inicios hemos trabajado para construir un espacio seguro y profesional.
+                Con más de 10 años de experiencia, seguimos creciendo junto a nuestra comunidad.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="text-secondary">Nuestro equipo</h2>
+            <p>
+                Contamos con doctores especializados y personal capacitado que se esfuerzan día a día
+                por brindar la mejor atención.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="text-secondary">Ubicación</h2>
+            <p>
+                Nos encontramos en el corazón de la ciudad, con fácil acceso y estacionamiento disponible.
+            </p>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Dirección</h5>
+                    <p class="card-text">Av. Principal #123, Santiago, Nuevo León</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="text-center mt-5">
+        <AuthorizeView>
+            <Authorized>
+                <NavLink class="btn btn-primary btn-lg" href="/cliente/miscitas">Agendar cita</NavLink>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="btn btn-outline-primary btn-lg" href="/login">Registrarse / Iniciar sesión para agendar</NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</div>
+
+@code
+{
+ 
+}

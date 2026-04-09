@@ -1,0 +1,16 @@
+services:
+  api:
+    env_file:
+      - .env
+    environment:
+      - DB_CONNECTION=${DB_CONNECTION}
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+
+
+
+
+
+
+     

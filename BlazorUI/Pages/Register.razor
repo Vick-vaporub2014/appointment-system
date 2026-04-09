@@ -1,0 +1,68 @@
+﻿@page "/register"
+
+@using static BlazorUI.Models.Auth
+@inject NavigationManager NavigationManager
+@inject IAuthServices IAuthServices
+
+
+<div class="d-flex justify-content-center align-items-start mt-5 vh-100">
+    <div class="card shadow-sm" style="width: 450px;">
+        <div class="card-body">
+            <h3 class="text-center mb-4">Registro</h3>
+
+            <EditForm Model="@registerModel" OnValidSubmit="HandleRegister">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label class="form-label">Nombre completo</label>
+                    <InputText @bind-Value="registerModel.FullName" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Usuario</label>
+                    <InputText @bind-Value="registerModel.UserName" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <InputText @bind-Value="registerModel.Email" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <InputText @bind-Value="registerModel.Password" type="password" class="form-control" />
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Registrarse</button>
+                <a href="/" class="justify-content-center">Regresar</a>
+            </EditForm>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger mt-3 text-center">
+                    @errorMessage
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private RegisterDTO registerModel = new RegisterDTO();
+    private string? errorMessage;
+    
+    private async Task HandleRegister()
+    {
+        var resul = await IAuthServices.RegisterAsync(registerModel);
+        if (resul.Success)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = resul.Message;
+        }
+    }
+}
