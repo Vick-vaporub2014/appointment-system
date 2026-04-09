@@ -29,7 +29,7 @@ try
 var apiBaseUrl = builder.Configuration["ApiSettings:ApiBaseUrl"];
 if (string.IsNullOrEmpty(apiBaseUrl))
 {
-    throw new InvalidOperationException("ApiBaseUrl no está configurado en el frontend");
+    throw new InvalidOperationException("ApiBaseUrl no estï¿½ configurado en el frontend");
 }
 
 
