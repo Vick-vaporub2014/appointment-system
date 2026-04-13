@@ -42,6 +42,14 @@
 4. The SQL Server will be available at:
      ```bash
      localhost,1433
+## Database initialization
+### The docker-compose.yml mounts an initialization script (init.sql) into the SQL Server conteiner.
+### This script automatically creates:
+  - The database AppointmentsSystemDb
+  - The login appointments_api_user
+  - The user mapped to that login
+  - The required permissions (db_owner role)
+This means that after running " docker compose up --build ", the API can connect immediately using the configured conncetion string without manual setup.
 ## Principals Endpoints (example)
 <table>
   <thead>
