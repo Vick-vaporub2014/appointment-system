@@ -4,11 +4,24 @@ namespace BlazorUI.Services
 {
     public static class JwtParser
     {
+        public class JwtInfo 
+        {
+            public IEnumerable<Claim> Claims { get; set; }
+            public DateTime Expiration { get; set; }
+        }
         //This auxiliar class is used to parse the JWT token and extract the claims from it.
-        public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+        public static JwtInfo ParseClaimsFromJwt(string jwt)
         {
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(jwt);
+
+            var expClaim = token.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+            var exp = DateTime.UtcNow;
+
+            if (expClaim != null && long.TryParse(expClaim, out var expSeconds))
+            {
+                exp = DateTimeOffset.FromUnixTimeSeconds(expSeconds).UtcDateTime;
+            }
 
             var claims = token.Claims.ToList();
             var normalizedClaims = new List<Claim>(claims);
@@ -23,7 +36,11 @@ namespace BlazorUI.Services
                     normalizedClaims.Add(new Claim("role", c.Value));
                 }
             }
-            return normalizedClaims;
+            return new JwtInfo
+            {
+                Claims = normalizedClaims,
+                Expiration = exp
+            };
 
             //This dont work
 

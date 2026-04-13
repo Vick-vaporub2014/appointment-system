@@ -15,7 +15,7 @@ namespace WebApi.Controllers
         public UsersController(IUserService userService) {
             _userService = userService;
         }
-        [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
+        [Authorize(Roles = Roles.Admin + "," + Roles.Doctor )]
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserById(string userId)
         {
@@ -27,6 +27,23 @@ namespace WebApi.Controllers
             return Ok(result);
             
         }
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyUser()
+        {
+            var userId = User.FindFirst("sub")?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+            var result = await _userService.GetMyUserAsync(userId);
+            if (!result.Success)
+            {
+                return NotFound(result);
+            }
+            return Ok(result);
+        }
+
         [Authorize(Roles = Roles.Admin +"," + Roles.Doctor)]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()

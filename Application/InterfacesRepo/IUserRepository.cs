@@ -10,7 +10,8 @@ namespace Application.InterfacesRepo
     public interface IUserRepository
     {
         Task<UserDTO> GetByIdAsync(string userId);
-        Task<List<UserDTO>>GetAllAsync();
+        Task<UserDTO> GetMyUserAsync(string userId);
+        Task<List<UserDTO>> GetAllAsync();
         Task AssignRoleAsync(string userId, string role);
     }
 }

@@ -23,8 +23,8 @@ namespace BlazorUI.Services
                 
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
-            var claims = JwtParser.ParseClaimsFromJwt(token);
-            var identity = new ClaimsIdentity(claims, "jwt");
+            var jwtInfo = JwtParser.ParseClaimsFromJwt(token);
+            var identity = new ClaimsIdentity(jwtInfo.Claims, "jwt");
             var user = new ClaimsPrincipal(identity);
 
             return new AuthenticationState(user);
@@ -35,8 +35,8 @@ namespace BlazorUI.Services
         public Task NotifyUserAuthentication(TokenDTO tokens)
         {
 
-            var claims = JwtParser.ParseClaimsFromJwt(tokens.AccessToken);
-            var identity = new ClaimsIdentity(claims, "jwt");
+            var jwtInfo = JwtParser.ParseClaimsFromJwt(tokens.AccessToken);
+            var identity = new ClaimsIdentity(jwtInfo.Claims, "jwt");
             var user = new ClaimsPrincipal(identity);
 
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));

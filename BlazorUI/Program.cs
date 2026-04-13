@@ -53,4 +53,6 @@ builder.Services.AddHttpClient<ProtectedApiClient>(client =>
 
 
 builder.Services.AddAuthorizationCore();
+
+
 await builder.Build().RunAsync();

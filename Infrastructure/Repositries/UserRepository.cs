@@ -34,6 +34,20 @@ namespace Infrastructure.Repositries
             };
 
         }
+        public async Task<UserDTO> GetMyUserAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if(user == null) return null;
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return new UserDTO
+            {
+                UserId = user.Id,
+                Name = user.UserName,
+                Email = user.Email,
+                Role = roles.FirstOrDefault() ?? Roles.Patient
+            };
+        }
         public async Task<List<UserDTO>> GetAllAsync()
         {
             var users = _userManager.Users.ToList();
