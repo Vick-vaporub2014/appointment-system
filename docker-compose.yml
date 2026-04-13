@@ -26,7 +26,7 @@ services:
   frontend:
     build: ./BlazorUI
     ports:
-      - "5000:80"
+      - "5000:80" #Exponemos el puerto de Nignx que es el 80 a 5000 en el navegador
     depends_on:
       - api
 volumes:

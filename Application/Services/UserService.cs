@@ -40,6 +40,25 @@ namespace Application.Services
                 Message = "User retrieved successfully"
             };
         }
+        public async Task<ServiceResponse<UserDTO>> GetMyUserAsync(string userId)
+        {
+            var user = await _userRepository.GetMyUserAsync(userId);
+            if (user == null)
+            {
+                return new ServiceResponse<UserDTO>
+                {
+                    Success = false,
+                    Message = "User not found",
+                    ErrorType = "NotFound"
+                };
+            }
+            return new ServiceResponse<UserDTO>
+            {
+                Success = true,
+                Data = user,
+                Message = "User retrieved successfully"
+            };
+        }
         public async Task<ServiceResponse<List<UserDTO>>> GetAllUsersAsync()
         {
             var user= await _userRepository.GetAllAsync();
@@ -59,15 +78,26 @@ namespace Application.Services
                 Message = "Users retrieved successfully"
             };
         }
-        public async Task AssignRoleAsync(string userId, string role)
+        public async Task<ServiceResponse<object>> AssignRoleAsync(string userId, string role)
         {
-            
-            if (role != Roles.Admin && role != Roles.Patient && role!= Roles.Doctor)
-            throw new ArgumentException("Invalid role");
+            if (role != Roles.Admin && role != Roles.Patient && role != Roles.Doctor)
+                return new ServiceResponse<object>
+                {
+                    Success = false,
+                    Message = "Invalid role",
+                    ErrorType = "Validation"
+                };
 
             await _userRepository.AssignRoleAsync(userId, role);
-            await _auditLogService.LogActionAsync("Assign role", $"Assign Role {role}",$"user {userId} now have the role {role}");
+            await _auditLogService.LogActionAsync("Assign role", $"Assign Role {role}", $"user {userId} now has the role {role}");
+
+            return new ServiceResponse<object>
+            {
+                Success = true,
+                Message = "Role assigned successfully"
+            };
         }
+
 
 
     }

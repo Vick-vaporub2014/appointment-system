@@ -11,8 +11,8 @@ namespace Application.InterfacesServices
     public interface IUserService
     {
         Task<ServiceResponse<UserDTO>> GetUserByIdAsync(string userId);
+        Task<ServiceResponse<UserDTO>> GetMyUserAsync(string userId);
         Task<ServiceResponse<List<UserDTO>>> GetAllUsersAsync();
-        Task AssignRoleAsync(string userId, string role);
-
+        Task<ServiceResponse<object>> AssignRoleAsync(string userId, string role);
     }
 }
