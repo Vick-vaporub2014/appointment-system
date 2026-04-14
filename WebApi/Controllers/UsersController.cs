@@ -3,6 +3,8 @@ using Application.InterfacesServices;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace WebApi.Controllers
 {
@@ -31,7 +33,7 @@ namespace WebApi.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetMyUser()
         {
-            var userId = User.FindFirst("sub")?.Value;
+            var userId = User.Identity?.Name;
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized();
