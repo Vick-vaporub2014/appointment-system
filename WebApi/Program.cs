@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 
@@ -85,7 +86,8 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
+        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+        NameClaimType = JwtRegisteredClaimNames.Sub
     };
 });
 //Dynamic CORS CONFIGURATION

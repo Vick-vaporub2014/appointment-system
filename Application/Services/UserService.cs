@@ -67,14 +67,14 @@ namespace Application.Services
                 return new ServiceResponse<List<UserDTO>>
                 {
                     Success = false,
-                    Message = "No users found",
+                    Message = "No users registered yet",
                     ErrorType = "NotFound"
                 };
             }
             return new ServiceResponse<List<UserDTO>>
             {
                 Success = true,
-                Data = user.ToList(),
+                Data = user,
                 Message = "Users retrieved successfully"
             };
         }
