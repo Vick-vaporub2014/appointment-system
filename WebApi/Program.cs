@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 
@@ -87,7 +88,9 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-        
+        NameClaimType = ClaimTypes.NameIdentifier, // Set the NameClaimType to NameIdentifier to ensure User.FindFirstValue(ClaimTypes.NameIdentifier) works correctly
+        RoleClaimType = ClaimTypes.Role
+
     };
 });
 //Dynamic CORS CONFIGURATION
