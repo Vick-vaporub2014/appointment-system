@@ -33,7 +33,8 @@ namespace WebApi.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetMyUser()
         {
-            var userId = User.Identity?.Name;
+            var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized();
