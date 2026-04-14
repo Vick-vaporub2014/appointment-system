@@ -66,6 +66,7 @@ namespace BlazorUI.Services
                     ErrorType = "ClientError"
                 };
             }
+        }
         public async Task<ServiceResponse<List<Appointment>>> GetAppointmentByUserAsync(string userId)
         {
             try
@@ -102,3 +103,4 @@ namespace BlazorUI.Services
             }
         }
     }
+}
