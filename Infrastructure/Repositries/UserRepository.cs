@@ -77,19 +77,22 @@ namespace Infrastructure.Repositries
         public async Task AssignRoleAsync(string userId, string role)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
-            {
+            if (user == null)
+                throw new InvalidOperationException("User not found");
+
                 var currentRoles = await _userManager.GetRolesAsync(user);
-                if(currentRoles.Contains(role))
+
+                if (currentRoles.Contains(role))
                 {
                     return;
                 }
-                if(currentRoles.Any())
+                if (currentRoles.Any())
                 {
                     await _userManager.RemoveFromRolesAsync(user, currentRoles);
                 }
                 await _userManager.AddToRoleAsync(user, role);
-            }
+            
+
         }
 
     }
