@@ -14,9 +14,11 @@ namespace WebApi.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(IUserService userService) {
+        public UsersController(IUserService userService, ILogger<UsersController> logger) {
             _userService = userService;
+            _logger = logger;
         }
         [Authorize(Roles = Roles.Admin + "," + Roles.Doctor )]
         [HttpGet("{userId}")]
@@ -82,10 +84,12 @@ namespace WebApi.Controllers
             }  
             catch(DbUpdateException ex)
             {
-                return BadRequest(new { Success = false, Message = "Error updating database", Error = ex.Message });
+                _logger.LogError(ex, "Error updating database", dto.UserId);
+                return BadRequest(new { Success = false, Message = "Error updating database", Error = ex.InnerException?.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error occurred");
                 return BadRequest(new { Success = false, Message = ex.Message });
             }
 
