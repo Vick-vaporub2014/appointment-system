@@ -87,6 +87,16 @@ namespace Application.Services
                     Message = "Invalid role",
                     ErrorType = "Validation"
                 };
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return new ServiceResponse<object>
+                {
+                    Success = false,
+                    Message = "User not found",
+                    ErrorType = "NotFound"
+                };
+            }
 
             await _userRepository.AssignRoleAsync(userId, role);
             await _auditLogService.LogActionAsync("Assign role", $"Assign Role {role}", $"user {userId} now has the role {role}");

@@ -80,9 +80,17 @@ namespace Infrastructure.Repositries
             if (user != null)
             {
                 var currentRoles = await _userManager.GetRolesAsync(user);
-                await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                if(currentRoles.Contains(role))
+                {
+                    return;
+                }
+                if(currentRoles.Any())
+                {
+                    await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                }
                 await _userManager.AddToRoleAsync(user, role);
             }
         }
+
     }
 }
