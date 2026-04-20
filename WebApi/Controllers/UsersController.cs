@@ -82,7 +82,7 @@ namespace WebApi.Controllers
             }  
             catch(DbUpdateException ex)
             {
-                return BadRequest(new { Success = false, Message = ex.Message });
+                return BadRequest(new { Success = false, Message = "Error updating database", Error = ex.Message });
             }
             catch (Exception ex)
             {
