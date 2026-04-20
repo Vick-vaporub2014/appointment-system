@@ -3,9 +3,11 @@ using Application.InterfacesRepo;
 using Application.InterfacesServices;
 using Domain.Enitities;
 using Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,11 +17,13 @@ namespace Application.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IAuditLogService _auditLogService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(IUserRepository userRepository, IAuditLogService auditLogService)
+        public UserService(IUserRepository userRepository, IAuditLogService auditLogService, IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
             _auditLogService = auditLogService;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<ServiceResponse<UserDTO>> GetUserByIdAsync(string userId)
         {
@@ -97,9 +101,19 @@ namespace Application.Services
                     ErrorType = "NotFound"
                 };
             }
-
+            
             await _userRepository.AssignRoleAsync(userId, role);
-            await _auditLogService.LogActionAsync("Assign role", $"Assign Role {role}", $"user {userId} now has the role {role}");
+            var actorUserId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(string.IsNullOrEmpty(actorUserId))
+            {
+                return new ServiceResponse<object>
+                {
+                    Success = false,
+                    Message = "Unable to identify the user performing the action",
+                    ErrorType = "NotFound"
+                };
+            }
+            await _auditLogService.LogActionAsync(actorUserId, $"Assign Role {role}", $"user {userId} now has the role {role}");
 
             return new ServiceResponse<object>
             {
