@@ -13,21 +13,22 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-using var http = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
-// Load the appsettings.json configuration file from the server always
-//builder.Configuration.AddJsonStream(await http.GetStreamAsync("appsettings.json"));
-////And then load the appsettings.{}.json configurate file based on the environment
-try
-{
-    builder.Configuration.AddJsonStream(await http.GetStreamAsync($"appsettings.{builder.HostEnvironment.Environment}.json"));
-} catch (HttpRequestException ex) when(ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-{
-}
+//using var http = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
+
+//try
+//{
+//    builder.Configuration.AddJsonStream(await http.GetStreamAsync($"appsettings.{builder.HostEnvironment.Environment}.json"));
+//} catch (HttpRequestException ex) when(ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+//{
+//}
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                     .AddJsonFile($"appsettings.{builder.HostEnvironment.Environment}.json", optional: true, reloadOnChange: true);
 
 //builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
 //                     .AddJsonFile($"appsettings.{builder.HostEnvironment.Environment}.json", optional: true);
 
-var apiBaseUrl = builder.Configuration["ApiSettings:ApiBaseUrl"];
+var apiBaseUrl = builder.Configuration["ApiSettings:ApiBaseUrl"]
+    ?? Environment.GetEnvironmentVariable("API_BASE_URL");
 if (string.IsNullOrEmpty(apiBaseUrl))
 {
     throw new InvalidOperationException("ApiBaseUrl no esta configurado en el frontend");

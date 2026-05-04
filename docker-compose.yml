@@ -29,6 +29,8 @@ services:
       - "5000:80" #Exponemos el puerto de Nignx que es el 80 a 5000 en el navegador
     depends_on:
       - api
+    environment:
+      - API_BASE_URL=http://localhost:8080/
 volumes:
   sql_data:
 

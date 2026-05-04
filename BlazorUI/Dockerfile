@@ -4,8 +4,8 @@ WORKDIR /src
 
 # Copia el proyecto
 COPY . .
-# Publicamos en Release
-RUN dotnet publish -c Release -o /app/publish
+# Publicamos en Debug porque es el desarrollo local
+RUN dotnet publish -c Debug -o /app/publish
 
 #Nginx para servir los archivos estáticos de Blazor WASM
 FROM nginx:alpine AS final
