@@ -4,7 +4,7 @@ WORKDIR /src
 COPY . .
 WORKDIR /src/WebApi
 RUN dotnet restore
-RUN dotnet publish -c Release -o /app
+RUN dotnet publish -c Debug -o /app
 
 # Etapa 2: runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
