@@ -1,8 +1,10 @@
 ﻿@page "/register"
 
 @using static BlazorUI.Models.Auth
+@using FluentValidation
 @inject NavigationManager NavigationManager
 @inject IAuthServices IAuthServices
+
 
 
 <div class="d-flex justify-content-center align-items-start mt-5 vh-100">
@@ -10,28 +12,33 @@
         <div class="card-body">
             <h3 class="text-center mb-4">Registro</h3>
 
-            <EditForm Model="@registerModel" OnValidSubmit="HandleRegister">
+            <EditForm EditContext="@editContext" OnValidSubmit="HandleRegister">
                 <DataAnnotationsValidator />
+
                 <ValidationSummary />
 
                 <div class="mb-3">
                     <label class="form-label">Nombre completo</label>
                     <InputText @bind-Value="registerModel.FullName" class="form-control" />
+                    <ValidationMessage For="@(() => registerModel.FullName)" />
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Usuario</label>
                     <InputText @bind-Value="registerModel.UserName" class="form-control" />
+                    <ValidationMessage For="@(() => registerModel.UserName)" />
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Email</label>
                     <InputText @bind-Value="registerModel.Email" class="form-control" />
+                    <ValidationMessage For="@(() => registerModel.Email)" />
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Contraseña</label>
                     <InputText @bind-Value="registerModel.Password" type="password" class="form-control" />
+                    <ValidationMessage For="@(() => registerModel.Password)" />
                 </div>
 
                 <button type="submit" class="btn btn-success w-100">Registrarse</button>
@@ -50,19 +57,48 @@
 
 
 @code {
-    private RegisterDTO registerModel = new RegisterDTO();
+    private RegisterDTO registerModel = new();
     private string? errorMessage;
-    
+    private EditContext editContext;
+    private ValidationMessageStore messageStore;
+
+    protected override void OnInitialized()
+    {
+        registerModel = new RegisterDTO();
+        editContext = new EditContext(registerModel);
+        messageStore = new ValidationMessageStore(editContext);
+
+        editContext.OnFieldChanged += (sender, e) =>
+        {
+            // Limpia errores de ese campo al cambiar
+            messageStore.Clear(e.FieldIdentifier);
+            editContext.NotifyValidationStateChanged();
+        };
+    }
+
     private async Task HandleRegister()
     {
-        var resul = await IAuthServices.RegisterAsync(registerModel);
-        if (resul.Success)
+        var validator = new RegisterVallidation();
+        var result = await validator.ValidateAsync(registerModel);
+
+        if (!result.IsValid)
         {
-            NavigationManager.NavigateTo("/");
+            foreach (var error in result.Errors)
+            {
+                var fieldIdentifier = new FieldIdentifier(registerModel, error.PropertyName);
+                messageStore.Add(fieldIdentifier, error.ErrorMessage);
+            }
+            editContext.NotifyValidationStateChanged();
+            return;
+        }
+        var response = await IAuthServices.RegisterAsync(registerModel);
+        if (response.Success)
+        {
+            NavigationManager.NavigateTo("/login");
         }
         else
         {
-            errorMessage = resul.Message;
+            errorMessage = response.Data;
         }
     }
 }

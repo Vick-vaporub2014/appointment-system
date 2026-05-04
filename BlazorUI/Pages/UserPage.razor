@@ -1,0 +1,84 @@
+﻿@page "/users"
+@layout AdminLayout
+
+@if (isAdmin)
+{
+    <h3>UserPage</h3>
+
+    <div class="d-flex align-items-center mb-3 gap-2">
+
+
+        <input type="text" class="form-control w-auto"
+        placeholder="Buscar por usuario"
+        @oninput="OnSearchUserChanged" />
+
+        <select class="form-select w-auto" @bind="SelectedRoles">
+            <p>Filtro por rol</p>
+            <option value="AllRoles">AllRoles</option>
+            <option value="Admin">Admin</option>
+            <option value="Patient">Patient</option>
+            <option value="Doctor">Doctor</option>
+        </select>
+
+        <span class="badge bg-primary ms-2">
+            Resultado: @usersFiltered.Count()
+        </span>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (usersFiltered == null)
+            {
+                <tr>
+                    <td colspan="4" class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </td>
+                </tr>
+            }
+            else if (!usersFiltered.Any())
+            {
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        No tienes usuarios registrados.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var user in usersFiltered)
+                {
+                    <tr>
+                        <td>@user.Name</td>
+                        <td>@user.Email</td>
+                        <td>@user.Role</td>
+                        <td>@user.UserId</td>
+                        <td>
+                            <NavLink class="btn btn-sm btn-warning"
+                            href="@($"/assign-role/{user.UserId}")">
+                                Editar Rol
+                            </NavLink>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="container mt-4">
+        <div class="alert alert-danger text-center">
+            No tienes permisos para acceder a esta página.
+        </div>
+    </div>
+}
+

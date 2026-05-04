@@ -36,7 +36,7 @@ namespace WebApi.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetMyUser()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
             {

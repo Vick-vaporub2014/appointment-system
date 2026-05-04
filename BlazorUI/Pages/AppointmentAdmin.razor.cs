@@ -36,6 +36,10 @@ namespace BlazorUI.Pages
         //To bind the datetime-local input, we need a string property that we can convert to DateTime when saving
         private string dateTimeString;
 
+        private bool isDoctor;
+        private bool isAdmin;
+        private bool isPatient;
+
         //Refresh
         private async Task Refresh()
         {
@@ -86,10 +90,17 @@ namespace BlazorUI.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            isDoctor = user.IsInRole("Doctor");
+            isAdmin = user.IsInRole("Admin");
+            isPatient = user.IsInRole("Patient");
+
             var result = await IAppointmentService.GetAllAppointmentAsync();
             if (result.Success)
             {
                 appointments = result.Data;
+                OnSearchUserChanged(new ChangeEventArgs { Value = "" }); // Initialize the filtered list with all appointments
                 ApplyFilter();
             }
             else
@@ -258,5 +269,10 @@ namespace BlazorUI.Pages
             }
             editContext.NotifyValidationStateChanged();
         }
+        private void OnSearchUserChanged(ChangeEventArgs e)
+        {
+            searchUser = e.Value?.ToString() ?? string.Empty;
+            ApplyFilter();
+        }   
     }
 }

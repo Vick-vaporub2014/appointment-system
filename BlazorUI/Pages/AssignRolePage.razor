@@ -1,0 +1,48 @@
+﻿@page "/assign-role/{UserId}"
+
+<h3>AssignRole</h3>
+<div class="container mt-4">
+    <h3>Editar Rol de Usuario</h3>
+
+    @if (user != null)
+    {
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input class="form-control" value="@user.Name" disabled />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" value="@user.Email" disabled />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Rol</label>
+            <select class="form-select" @bind="selectedRole">
+                <option value="Admin">Admin</option>
+                <option value="Doctor">Doctor</option>
+                <option value="Patient">Patient</option>
+            </select>
+        </div>
+        <button class="btn btn-warning" @onclick="UpdateRole">Actualizar Rol</button>
+        <NavLink class="btn btn-warning" href="/users">Volver</NavLink>
+
+        @if (showWarning)
+        {
+            <div class="alert alert-danger mt-3">
+                <strong>Advertencia:</strong> Estás a punto de cambiar el rol de este usuario.
+                <div class="mt-2">
+                    <button class="btn btn-danger" @onclick="ConfirmUpdate">Confirmar</button>
+                    <button class="btn btn-secondary" @onclick="() => showWarning = false">Cancelar</button>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-info mt-3">@message</div>
+        }
+    }
+    else
+    {
+        <p class="text-muted">Cargando usuario...</p>
+    }
+</div>

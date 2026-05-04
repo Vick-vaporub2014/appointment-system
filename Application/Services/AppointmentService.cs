@@ -14,7 +14,7 @@ namespace Application.Services
         private readonly IAuditLogService _auditLogService;
         private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
-
+     
 
         public AppointmentService(IAppointmentRepository repository, IAuditLogService auditLogService, IUserService userService, IUnitOfWork unitOfWork )
         {
@@ -47,12 +47,11 @@ namespace Application.Services
                 "pendiente",
                 dto.Notes
             );
-            await _unitOfWork.BeginTransactionAsync();
             try
             {
                 await _repository.AddAsync(appointment);
                 await _auditLogService.LogActionAsync(dto.UserId, "Created", $"Created appointment {appointment.AppointmentId} for user {dto.UserId} at {dto.DateTime}");
-                await _unitOfWork.CommitAsync();
+                await _unitOfWork.SaveChangesAsync();
                 var userDto = await _userService.GetUserByIdAsync(appointment.UserId);
                 return new ServiceResponse<AppointmentsDTO>
                 {
@@ -70,7 +69,7 @@ namespace Application.Services
                 };
             }
             catch (InvalidOperationException ex) {
-                await _unitOfWork.RollbackAsync();
+                
                 return new ServiceResponse<AppointmentsDTO>
                 {
                     Success = false,
@@ -80,7 +79,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackAsync();
+               
                 return new ServiceResponse<AppointmentsDTO>
                 {
                     Success = false,
@@ -101,13 +100,13 @@ namespace Application.Services
                     ErrorType = "NotFound"
                 };
             }
-            await _unitOfWork.BeginTransactionAsync();
+            
             try
             {
                 appointment.UpdateStatus(dto.Status, dto.Notes);
                 await _repository.UpdateAsync(appointment);
                 await _auditLogService.LogActionAsync(appointment.UserId, "Updated", $"Update appointment {appointment.AppointmentId} for {appointment.UserId} at {appointment.DateTime}" );
-                await _unitOfWork.CommitAsync();
+                await _unitOfWork.SaveChangesAsync();
                 var userDto = await _userService.GetUserByIdAsync(appointment.UserId);
                 return new ServiceResponse<AppointmentsDTO>
                 {
@@ -126,7 +125,7 @@ namespace Application.Services
             }
             catch (InvalidOperationException ex) 
             {
-                await _unitOfWork.RollbackAsync();
+              
                 return new ServiceResponse<AppointmentsDTO>
                 {
                     Success = false,
@@ -136,7 +135,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackAsync();
+               
                 return new ServiceResponse<AppointmentsDTO>
                 {
                     Success = false,
@@ -217,12 +216,12 @@ namespace Application.Services
                 };
             }
 
-            await _unitOfWork.BeginTransactionAsync();
+           
             try
             {
                 await _repository.DeleteAsync(id);
                 await _auditLogService.LogActionAsync($"{appointment.UserId}","Deleted", $"Deleted appointment {id} for {appointment.UserId} at {appointment.DateTime}");
-                await _unitOfWork.CommitAsync();
+                await _unitOfWork.SaveChangesAsync();
                 return new ServiceResponse<bool>
                 {
                     Success = true,
@@ -232,7 +231,7 @@ namespace Application.Services
             }
             catch (InvalidOperationException ex)
             {
-                await _unitOfWork.RollbackAsync();
+               
                 return new ServiceResponse<bool>
                 {
                     Success = false,
@@ -243,7 +242,7 @@ namespace Application.Services
             }
             catch (Exception ex) 
             {
-                await _unitOfWork.RollbackAsync();
+              
                 return new ServiceResponse<bool>
                 {
                     Success = false,
