@@ -13,11 +13,9 @@ namespace BlazorUI.Validators
 
             RuleFor(x => x.DateTime)
             .Must(BeInFuture).WithMessage("La cita debe ser en el futuro.")
-                .Unless(x => x.DateTime == DateTime.MinValue);
-
-            RuleFor(x => x.DateTime)
+                .Unless(x => x.DateTime == DateTime.MinValue)
             .Must(HaveWholeHour).WithMessage("La cita debe comenzar en una hora exacta (ej. 13:00, 14:00).")
-            .Unless(x => x.DateTime == DateTime.MinValue);
+                .Unless(x => x.DateTime == DateTime.MinValue);
 
 
             RuleFor(x => x.Notes)

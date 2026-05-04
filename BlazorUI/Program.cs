@@ -6,6 +6,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using static BlazorUI.Models.Auth;
 using static BlazorUI.Services.Typed_clients;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -29,17 +30,21 @@ try
 var apiBaseUrl = builder.Configuration["ApiSettings:ApiBaseUrl"];
 if (string.IsNullOrEmpty(apiBaseUrl))
 {
-    throw new InvalidOperationException("ApiBaseUrl no est� configurado en el frontend");
+    throw new InvalidOperationException("ApiBaseUrl no esta configurado en el frontend");
 }
 
 
 builder.Services.AddLocalStorageServices();
 builder.Services.AddScoped<IAuthServices, AuthServices>();
+builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<CustomAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
     sp.GetRequiredService<CustomAuthStateProvider>());
-builder.Services.AddValidatorsFromAssemblyContaining<CreateAppointment>(); // FluentValidation validators
+// FluentValidation validators
+builder.Services.AddValidatorsFromAssemblyContaining<CreateAppointment>(); 
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterDTO>();
+
 builder.Services.AddHttpClient<PublicApiClient>(client => 
 {
     client.BaseAddress = new Uri(apiBaseUrl);

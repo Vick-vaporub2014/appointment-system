@@ -30,16 +30,24 @@ builder.Configuration
     .AddEnvironmentVariables();
 //Read environment variables
 var jwtKey = builder.Configuration["JWT_KEY"];
+if(string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("JWT_KEY debe estar configurado en el archivo de configuración.");
+}
 var jwtIssuer = builder.Configuration["JWT_ISSUER"];
 var jwtAudience = builder.Configuration["JWT_AUDIENCE"];
 var connectionString = builder.Configuration["DB_CONNECTION"];
+if(string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("DB_CONNECTION debe estar configurado en el archivo de configuración.");
+}
 
 if (builder.Environment.IsProduction() || builder.Environment.IsEnvironment("Docker"))
 {
-    if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(connectionString))
-    {
-        throw new InvalidOperationException("JWT_KEY y DB_CONNECTION deben estar configurados en producción/Docker.");
-    }
+    //if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(connectionString))
+    //{
+    //    throw new InvalidOperationException("JWT_KEY y DB_CONNECTION deben estar configurados en producción/Docker.");
+    //}
 }
 
 if (string.IsNullOrEmpty(connectionString))
@@ -50,9 +58,17 @@ if (string.IsNullOrEmpty(connectionString))
 
 
 //Connection to SQL Server Database
+//Dbcontext configuration with retry logic for transient faults
+//This will automatically retry failed database operations up to 5 times with a delay of up to 10 seconds between retries, which can help improve the resilience
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
+    options.UseSqlServer(connectionString, sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,              // número de reintentos
+            maxRetryDelay: TimeSpan.FromSeconds(10), // tiempo máximo entre reintentos
+            errorNumbersToAdd: null        // usa los errores transitorios por defecto
+        );
+    }));
 //Register the identity services and configure it to use the ApplicationDbContext and ApplicationUser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -68,7 +84,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ErrorHandlingMiddlewareService>();
+//builder.Services.AddScoped<ErrorHandlingMiddlewareService>();
 
 //Configure JWT authentication
 builder.Services.AddAuthentication(options =>
@@ -96,14 +112,14 @@ builder.Services.AddAuthentication(options =>
 //Dynamic CORS CONFIGURATION
 // Load allowed origins from configuration (appsettings.json)
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DynamicCors", policy =>
     {
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        if (allowedOrigins != null && allowedOrigins.Length > 0)
+            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+        else
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
 });
 
@@ -156,22 +172,22 @@ app.UseExceptionHandler(errorApp =>
         }
     });
 });
+app.UseRouting();
 //Use  CORS policy
 app.UseCors("DynamicCors");
 
     // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
+    if (app.Environment.IsProduction() || app.Environment.IsDevelopment())
     {
         //app.MapOpenApi();
         app.UseSwagger();
         app.UseSwaggerUI();
     }
 app.UseHttpsRedirection();
-app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<ErrorHandlingMiddlewareService>();
 app.MapControllers();
+app.MapGet("/", () => "API AppointmentSystem está corriendo ");
 app.Run();
 
 

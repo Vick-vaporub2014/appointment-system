@@ -28,6 +28,11 @@ namespace BlazorUI.Pages
         //To bind the datetime-local input, we need a string property that we can convert to DateTime when saving
         private string dateTimeString;
 
+        private bool isPatient;
+        private bool isDoctor;
+        private bool isAdmin;
+
+        private string? errorMessage;
         private async Task Refresh()
         {
             var result = await IAppointmentService.GetAllAppointmentAsync();
@@ -52,11 +57,21 @@ namespace BlazorUI.Pages
         }
         protected override async Task OnInitializedAsync()
         {
-            var userId = (await AuthStateProvider.GetAuthenticationStateAsync()).User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            var result = await IAppointmentService.GetAppointmentByUserAsync(userId);
-            if (result.Success)
+            isPatient = (await AuthStateProvider.GetAuthenticationStateAsync()).User.IsInRole("Patient");
+            isAdmin = (await AuthStateProvider.GetAuthenticationStateAsync()).User.IsInRole("Admin");
+            isDoctor= (await AuthStateProvider.GetAuthenticationStateAsync()).User.IsInRole("Doctor");
+
+            
+            try
             {
-                appointments = result.Data;
+                var userId = (await AuthStateProvider.GetAuthenticationStateAsync()).User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                var result = await IAppointmentService.GetAppointmentByUserAsync(userId);
+                appointments = result.Success ? result.Data : new List<Appointment>();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error al cargar las citas: {ex.Message}" ?? "No se pudieron cargar las citas";
+                appointments = new List<Appointment>();
             }
         }
         private DateTime DateTimeValue

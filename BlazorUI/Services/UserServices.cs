@@ -29,11 +29,11 @@ namespace BlazorUI.Services
                 };
             }
         }
-        public async Task<ServiceResponse<User>> GetMyUserAsync()
+        public async Task<ServiceResponse<User>> GetMyUserAsync(string userId)
         {
             try
             {
-                return await _httpClient.GetFromJsonAsync<ServiceResponse<User>>("api/Users/me");
+                return await _httpClient.GetFromJsonAsync<ServiceResponse<User>>($"api/Users/me?userId={userId}");
             }
             catch (Exception ex)
             {

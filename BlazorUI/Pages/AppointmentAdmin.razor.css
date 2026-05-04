@@ -1,5 +1,4 @@
-﻿body {
-}
+﻿
 .my-toast {
     position: fixed;
     right: 20px;
@@ -31,3 +30,18 @@
         color: #000;
     }
 
+.appointment-scroll {
+    height: calc(100vh - 120px); /* pantalla menos navbar+filtros */
+    overflow-y: auto;
+    padding: 10px;
+    background: #eee;
+}
+
+.filters-bar {
+    position: sticky;
+    top: 60px; /* justo debajo del navbar */
+    background: #f8f9fa;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    z-index: 1039;
+}

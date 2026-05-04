@@ -2,6 +2,7 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+
 h1:focus {
     outline: none;
 }
@@ -111,4 +112,20 @@ code {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
+}
+
+.appointment-scroll {
+    height: calc(100vh - 120px); /* pantalla menos navbar+filtros */
+    overflow-y: auto;
+    padding: 10px;
+    background: #eee;
+}
+
+.filters-bar {
+    position: sticky;
+    top: 60px; /* justo debajo del navbar */
+    background: #f8f9fa;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    z-index: 1039;
 }
