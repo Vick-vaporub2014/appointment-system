@@ -109,7 +109,7 @@
             <div class="mb-3">
                 <h3>El rango de citas es de 1hr</h3>
                 <label class="form-label">Fecha y hora</label>
-                <InputText type="datetime-local" @bind-Value="dateTimeString" class="form-control" />
+                <InputText type="datetime-local" @bind-Value="dateTimeString" class="form-control" @oninput="OnDateChanged"/>
                 <ValidationMessage For="@(() => createAppointment.DateTime)" />
 
             </div>

@@ -15,6 +15,7 @@ RUN rm -rf ./*
 # Copia los archivos publicados
 COPY --from=build /app/publish/wwwroot .
 
+
 # Copia la configuración personalizada de Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 

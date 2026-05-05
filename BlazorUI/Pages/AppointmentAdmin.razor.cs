@@ -212,12 +212,19 @@ namespace BlazorUI.Pages
         private async Task SaveCreate()
         {
             createAppointment.DateTime = DateTimeValue;
+            messageStore.Clear();
 
             //Validate the form using FluentValidation
             var resultValidator = createAppointmentValidator.Validate(createAppointment);
             if (!resultValidator.IsValid)
             {
-                ShowValidationErrors(resultValidator);
+                foreach (var validation in resultValidator.Errors)
+                {
+                    var fieldIdentifier = new FieldIdentifier(createAppointment, validation.PropertyName);
+                    messageStore.Add(fieldIdentifier, validation.ErrorMessage);
+                }
+
+                editContext.NotifyValidationStateChanged();
                 return;
             }
 
@@ -235,6 +242,12 @@ namespace BlazorUI.Pages
                 isCreateOpen = false;
                 createAppointment = new CreateAppointment();
                 editContext = new EditContext(createAppointment);
+                messageStore = new ValidationMessageStore(editContext);
+                editContext.OnFieldChanged += (sender, e) =>
+                {
+                    messageStore.Clear(e.FieldIdentifier);
+                    editContext.NotifyValidationStateChanged();
+                };
                 await Refresh();
             }
             else
@@ -273,6 +286,22 @@ namespace BlazorUI.Pages
         {
             searchUser = e.Value?.ToString() ?? string.Empty;
             ApplyFilter();
-        }   
+        }
+
+        //When the user changes the search notes input, we update the searchNotes property and apply the filter to update the displayed appointments
+        private void OnDateChanged(ChangeEventArgs e)
+        {
+            dateTimeString = e.Value?.ToString() ?? string.Empty;
+            
+            if (DateTime.TryParse(dateTimeString, out var dateTime))
+            {
+                //Convert the dateTimeString to DateTime and assign it to the createAppointment model
+                createAppointment.DateTime = dateTime;
+
+                //Notify the EditContext that the DateTime field has changed so it can re-validate and update the UI
+                var fieldIdentifier = new FieldIdentifier(createAppointment, nameof(createAppointment.DateTime));
+                editContext.NotifyFieldChanged(fieldIdentifier);
+            }
+        }
     }
 }
