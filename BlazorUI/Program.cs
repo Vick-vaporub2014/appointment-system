@@ -27,11 +27,11 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 //builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
 //                     .AddJsonFile($"appsettings.{builder.HostEnvironment.Environment}.json", optional: true);
 
-var apiBaseUrl = builder.Configuration["ApiSettings:ApiBaseUrl"]
-    ?? Environment.GetEnvironmentVariable("API_BASE_URL");
+var apiBaseUrl = builder.Configuration["ApiSettings:ApiBaseUrl"];
+
 if (string.IsNullOrEmpty(apiBaseUrl))
 {
-    throw new InvalidOperationException("ApiBaseUrl no esta configurado en el frontend");
+    throw new InvalidOperationException("ApiBaseUrl no está configurado en el frontend");
 }
 
 

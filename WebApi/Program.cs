@@ -177,7 +177,7 @@ app.UseRouting();
 app.UseCors("DynamicCors");
 
     // Configure the HTTP request pipeline.
-    if (app.Environment.IsProduction() || app.Environment.IsDevelopment())
+    if (app.Environment.IsDevelopment())
     {
         //app.MapOpenApi();
         app.UseSwagger();
