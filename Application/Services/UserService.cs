@@ -27,7 +27,9 @@ namespace Application.Services
         }
         public async Task<ServiceResponse<UserDTO>> GetUserByIdAsync(string userId)
         {
+            
             var user = await _userRepository.GetByIdAsync(userId);
+
             if (user == null)
             {
                 return new ServiceResponse<UserDTO>
@@ -40,8 +42,15 @@ namespace Application.Services
             return new ServiceResponse<UserDTO>
             {
                 Success = true,
-                Data = user,
-                Message = "User retrieved successfully"
+                Message = "User retrieved successfully",
+                Data = new UserDTO { 
+                    UserId = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+
+
+                }
+                
             };
         }
         public async Task<ServiceResponse<UserDTO>> GetMyUserAsync(string userId)
@@ -52,21 +61,28 @@ namespace Application.Services
                 return new ServiceResponse<UserDTO>
                 {
                     Success = false,
-                    Message = "User not found",
+                    Message = "Profile information could not be retrieved",
                     ErrorType = "NotFound"
                 };
             }
             return new ServiceResponse<UserDTO>
             {
                 Success = true,
-                Data = user,
-                Message = "User retrieved successfully"
+                Message = "Profile retrieved successfully",
+                Data = new UserDTO
+                {
+                    UserId = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    Role = user.Role
+                }
+                
             };
         }
         public async Task<ServiceResponse<List<UserDTO>>> GetAllUsersAsync()
         {
-            var user= await _userRepository.GetAllAsync();
-            if (user == null || !user.Any())
+            var users = await _userRepository.GetAllAsync();// Get all User entities from the repository -> List<User>
+            if (users == null || !users.Any())
             {
                 return new ServiceResponse<List<UserDTO>>
                 {
@@ -75,17 +91,26 @@ namespace Application.Services
                     ErrorType = "NotFound"
                 };
             }
+            // Map User entities to UserDTOs -> List<UserDTO>
+            var usersDTO = users.Select(u => new UserDTO
+            {
+                UserId = u.Id,
+                Name = u.Name,
+                Email = u.Email,
+                Role = u.Role
+            }).ToList();
+
             return new ServiceResponse<List<UserDTO>>
             {
                 Success = true,
-                Data = user,
+                Data = usersDTO,
                 Message = "Users retrieved successfully"
             };
         }
-        public async Task<ServiceResponse<object>> AssignRoleAsync(string userId, string role)
+        public async Task<ServiceResponse<AssignRoleDTO>> AssignRoleAsync(string userId, string role)
         {
             if (role != Roles.Admin && role != Roles.Patient && role != Roles.Doctor)
-                return new ServiceResponse<object>
+                return new ServiceResponse<AssignRoleDTO>
                 {
                     Success = false,
                     Message = "Invalid role",
@@ -94,31 +119,45 @@ namespace Application.Services
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                return new ServiceResponse<object>
+                return new ServiceResponse<AssignRoleDTO>
                 {
                     Success = false,
                     Message = "User not found",
                     ErrorType = "NotFound"
                 };
             }
-            
-            await _userRepository.AssignRoleAsync(userId, role);
-            var actorUserId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if(string.IsNullOrEmpty(actorUserId))
+
+            var isAssigned = await _userRepository.AssignRoleAsync(userId, role);
+            if (!isAssigned)
             {
-                return new ServiceResponse<object>
+                return new ServiceResponse<AssignRoleDTO>
+                {
+                    Success = false,
+                    Message = "Failed to assign role due to an internal identity error",
+                    ErrorType = "InternalError"
+                };
+            }
+            var actorUserId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);// Get the ID of the user performing the action
+            if (string.IsNullOrEmpty(actorUserId))
+            {
+                return new ServiceResponse<AssignRoleDTO>
                 {
                     Success = false,
                     Message = "Unable to identify the user performing the action",
-                    ErrorType = "NotFound"
+                    ErrorType = "Unauthorized"
                 };
             }
             await _auditLogService.LogActionAsync(actorUserId, $"Assign Role {role}", $"user {userId} now has the role {role}");
 
-            return new ServiceResponse<object>
+            return new ServiceResponse<AssignRoleDTO>
             {
                 Success = true,
-                Message = "Role assigned successfully"
+                Message = "Role assigned successfully",
+                Data = new AssignRoleDTO
+                {
+                    UserId = userId,
+                    Role = role
+                }
             };
         }
 

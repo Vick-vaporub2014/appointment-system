@@ -1,10 +1,11 @@
 ﻿using Domain.Enitities;
-using Domain.Identity;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,25 +22,26 @@ namespace Infrastructure.DbContext
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            // Configure Appointment entity
-            
+
             builder.Entity<Appointment>()
-                .HasOne<ApplicationUser>()
-                .WithMany(u => u.Appointments)
-                .HasForeignKey(a => a.UserId);
+                    .HasOne<ApplicationUser>() 
+                    .WithMany()
+                    .HasForeignKey(a => a.UserId)
+                    .OnDelete(DeleteBehavior.Cascade); //This will ensure that when a user is deleted, all their appointments will also be deleted.
 
-            // Relación RefreshToken -> ApplicationUser
-            builder.Entity<RefreshToken>()
-                .HasOne<ApplicationUser>()
-                .WithMany(u => u.RefreshTokens)
-                .HasForeignKey(r => r.UserId);
-
-            // Relación AuditLog -> ApplicationUser
             builder.Entity<AuditLog>()
                 .HasOne<ApplicationUser>()
-                .WithMany(u =>u.AuditLogs)
-                .HasForeignKey(l => l.UserId);
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<RefreshToken>()
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
 
         }
     }
-    }
+}

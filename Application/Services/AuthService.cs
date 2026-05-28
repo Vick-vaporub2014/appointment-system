@@ -3,8 +3,6 @@ using Application.InterfacesServices;
 
 using Domain.Enitities;
 using Domain.Enums;
-using Domain.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using static Application.DTOs.AuthDTOs;
 
@@ -12,20 +10,18 @@ namespace Application.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly UserManager<ApplicationUser> _userManager; //Services for managing user accounts (Gestiona los usarios de la tabla)
-        private readonly SignInManager<ApplicationUser> _signInManager; //Services for handling user sign-in operations (Gestiona el inicio de sesion de los usuarios)
+        private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly ILogger<AuthService> _logger;
 
         public AuthService(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
+            IUserRepository userRepository,
             IRefreshTokenRepository refreshTokenRepository,
-            IJwtTokenGenerator jwtTokenGenerator, ILogger<AuthService> logger)
+            IJwtTokenGenerator jwtTokenGenerator, 
+            ILogger<AuthService> logger)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _userRepository = userRepository;
             _refreshTokenRepository = refreshTokenRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
             _logger = logger;
@@ -34,31 +30,28 @@ namespace Application.Services
         {
             try
             {
-                var user = new ApplicationUser
+                var newUser = new User
                 {
-                    UserName = dto.UserName,
                     Email = dto.Email,
-                    FullName = dto.FullName
+                    Name = dto.UserName,
+                    Role = Roles.Patient
                 };
-                var result = await _userManager.CreateAsync(user, dto.Password);
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, Roles.Patient);
-                }
-                if (!result.Succeeded)
+
+                var result = await _userRepository.CreateUserAsync(newUser, dto.Password);
+
+                if (!result)
                 {
                     return new ServiceResponse<string>
                     {
                         Success = false,
-                        Message = "User registered falied",
-                        Data = string.Join(", ", result.Errors.Select(e => e.Description))
+                        Message = "User registration failed. Check security policies or duplicate emails."
                     };
                 }
                 return new ServiceResponse<string>
                 {
                     Success = true,
                     Message = "User registered successfully",
-                    Data = user.Id
+                    Data = newUser.Id
                 };
             }
             catch (Exception ex)
@@ -76,24 +69,24 @@ namespace Application.Services
         public async Task<ServiceResponse<TokenDTO>> LoginAsync(LoginDTO dto)
         {
             try { 
-            var user = await _userManager.FindByEmailAsync(dto.Email);
+            var user = await _userRepository.FindByEmailAsync(dto.Email);
             if (user == null) { 
                 return new ServiceResponse<TokenDTO>
                 {
                     Success = false,
-                    Message = "Invalid email"
+                    Message = "Invalid credentials"
                 };
             }
-            var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-            if (!result.Succeeded)
+            var isPasswordValid = await _userRepository.CheckPasswordAsync(user, dto.Password);
+            if (!isPasswordValid)
             {
                 return new ServiceResponse<TokenDTO>
                 {
                     Success = false,
-                    Message = "Invalid password"
+                    Message = "Invalid credentials"
                 };
             }
-            var roles = await _userManager.GetRolesAsync(user);
+            var roles = new List<string> {user.Role };
             var accessToken = _jwtTokenGenerator.GenerateToken(user,roles);
             var refreshToken = new RefreshToken
             {
@@ -117,7 +110,7 @@ namespace Application.Services
 
         }catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Error in Login");
+                _logger.LogError(ex, "Error in Login");
                 return new ServiceResponse<TokenDTO>
                 {
                     Success = false,
@@ -138,8 +131,16 @@ namespace Application.Services
                         Message = "Invalid or expired refresh token "
                     };
                 }
-                var user = await _userManager.FindByIdAsync(storedToken.UserId);
-                var roles = await _userManager.GetRolesAsync(user);
+                var user = await _userRepository.GetByIdAsync(storedToken.UserId);
+                if (user == null)
+                {
+                    return new ServiceResponse<TokenDTO>
+                    {
+                        Success = false,
+                        Message = "User associated with the token not found"
+                    };
+                }
+                var roles = new List<string> {user.Role };
                 var newAccessToken = _jwtTokenGenerator.GenerateToken(user, roles);
 
                 return new ServiceResponse<TokenDTO>

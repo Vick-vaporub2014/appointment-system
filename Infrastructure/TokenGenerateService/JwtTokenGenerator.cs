@@ -1,5 +1,6 @@
 ﻿using Application.InterfacesServices;
-using Domain.Identity;
+using Domain.Enitities;
+using Infrastructure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,16 +17,14 @@ namespace Infrastructure.TokenGenerateService
         {
             _configuration = configuration;
         }
-        public string GenerateToken(ApplicationUser user, IList<string> roles)
+        public string GenerateToken(User user, IList<string> roles)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("FullName", user.FullName ?? string.Empty)
-
-            }
-            ;
+                new Claim(JwtRegisteredClaimNames.Name, user.Name)
+            };
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
