@@ -1,16 +1,11 @@
 ﻿
-using Domain.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Domain.Enitities;
 
 namespace Application.InterfacesServices
 {
     public interface IJwtTokenGenerator
     {
-        string GenerateToken(ApplicationUser user, IList<string> roles);
+        string GenerateToken(User user, IList<string> roles);
 
     }
 }

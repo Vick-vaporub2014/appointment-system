@@ -13,6 +13,6 @@ namespace Application.InterfacesServices
         Task<ServiceResponse<UserDTO>> GetUserByIdAsync(string userId);
         Task<ServiceResponse<UserDTO>> GetMyUserAsync(string userId);
         Task<ServiceResponse<List<UserDTO>>> GetAllUsersAsync();
-        Task<ServiceResponse<object>> AssignRoleAsync(string userId, string role);
+        Task<ServiceResponse<AssignRoleDTO>> AssignRoleAsync(string userId, string role);
     }
 }

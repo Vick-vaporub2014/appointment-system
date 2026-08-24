@@ -3,9 +3,9 @@ using Application.InterfacesRepo;
 using Application.InterfacesServices;
 using Application.Services;
 using Application.UnitOfWork;
-using Domain.Enums;
-using Domain.Identity;
+using Domain.Enums;  
 using Infrastructure.DbContext;
+using Infrastructure.Identity;
 using Infrastructure.Repositries;
 using Infrastructure.TokenGenerateService;
 using Infrastructure.UnitOfWork;
@@ -70,7 +70,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         );
     }));
 //Register the identity services and configure it to use the ApplicationDbContext and ApplicationUser
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Password settings
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 12;
+})
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -84,6 +89,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddHttpContextAccessor();
 //builder.Services.AddScoped<ErrorHandlingMiddlewareService>();
 
 //Configure JWT authentication
@@ -105,10 +111,11 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
         NameClaimType = ClaimTypes.NameIdentifier, // Set the NameClaimType to NameIdentifier to ensure User.FindFirstValue(ClaimTypes.NameIdentifier) works correctly
-        RoleClaimType = ClaimTypes.Role
-
+        RoleClaimType = ClaimTypes.Role,
+        ClockSkew = TimeSpan.Zero
     };
 });
+
 //Dynamic CORS CONFIGURATION
 // Load allowed origins from configuration (appsettings.json)
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
@@ -133,10 +140,8 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();// This will apply any pending migrations and create the database if it does not exist
-}
+
 //Create default roles if they do not exist
-using (var scope = app.Services.CreateScope())
-{
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     string[] roles = { Roles.Patient, Roles.Admin, Roles.Doctor };
     foreach (var role in roles)
