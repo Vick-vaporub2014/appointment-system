@@ -84,7 +84,7 @@ namespace WebApi.Controllers
             }  
             catch(DbUpdateException ex)
             {
-                _logger.LogError(ex, "Error updating database", dto.UserId);
+                _logger.LogError(ex, dto.UserId);
                 return BadRequest(new { Success = false, Message = "Error updating database", Error = ex.InnerException?.Message });
             }
             catch (Exception ex)
