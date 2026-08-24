@@ -20,14 +20,15 @@ namespace Infrastructure.Repositries
         }
         public async Task<Appointment> GetByIdAsync(int id)
         {
-            return await _context.Appointments.FirstOrDefaultAsync(a => a.AppointmentId == id);
+            return await _context.Appointments.AsNoTracking().FirstOrDefaultAsync(a => a.AppointmentId == id);
         }
 
         public async Task<IEnumerable<Appointment>> GetByUserIdAsync(string userId) =>
-            await _context.Appointments.Where(a => a.UserId == userId).ToListAsync();
+            await _context.Appointments.Where(a => a.UserId == userId).AsNoTracking().ToListAsync();
 
         public async Task<IEnumerable<Appointment>> GetAllAsync() =>
-            await _context.Appointments.ToListAsync();
+            await _context.Appointments.AsNoTracking() //AsNoTracking() is used to improve performance when you don't need to track changes to the entities
+                                        .ToListAsync();
 
         public async Task AddAsync(Appointment appointment)
         {

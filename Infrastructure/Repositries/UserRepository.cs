@@ -70,7 +70,7 @@ namespace Infrastructure.Repositries
                                    Name = u.FullName ?? u.UserName ?? string.Empty,
                                    Email = u.Email ?? string.Empty,
                                    Role = r != null ? r.Name : Roles.Patient
-                               }).ToListAsync();
+                               }).AsNoTracking().ToListAsync();
 
             return users;
 
