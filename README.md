@@ -2,6 +2,7 @@
 ## description
 ### Backend API for managing appointments with authentication,role-based authorization, and audit logging.
 ### Built using ASP.NET Core, Entity Framework, Clean Architecture. Planned Blazor frontend integration.
+###Link Azure: [https://victorious-wave-00b2a8b10.7.azurestaticapps.net/](https://victorious-wave-00b2a8b10.7.azurestaticapps.net/)
 ## Features
 
 - User authentication with JWT
